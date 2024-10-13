@@ -1,0 +1,260 @@
+{
+    "visualizations": {
+        "viz_tNcaE4yP": {
+            "type": "splunk.line",
+            "title": "Number of Loan Request",
+            "dataSources": {
+                "primary": "ds_GhbVFdD9"
+            },
+            "options": {
+                "seriesColors": [
+                    "#CB2196",
+                    "#99B100",
+                    "#7B56DB",
+                    "#00CDAF",
+                    "#DD9900",
+                    "#009CEB",
+                    "#FF677B",
+                    "#813193",
+                    "#0051B5",
+                    "#008C80",
+                    "#FFA476",
+                    "#FF6ACE",
+                    "#AE8CFF",
+                    "#00689D",
+                    "#00490A",
+                    "#465D00",
+                    "#9D6300",
+                    "#F6540B",
+                    "#FF969E",
+                    "#E47BFE"
+                ],
+                "backgroundColor": "#1F2A40"
+            },
+            "containerOptions": {},
+            "showProgressBar": false,
+            "showLastUpdated": false
+        },
+        "viz_8aHqMHqy": {
+            "type": "splunk.table",
+            "title": "Case Information",
+            "dataSources": {
+                "primary": "ds_nc18AvPe"
+            },
+            "options": {
+                "backgroundColor": "#2C3539",
+                "tableFormat": {
+                    "rowBackgroundColors": "> table | seriesByIndex(0) | pick(tableAltRowBackgroundColorsByBackgroundColor)",
+                    "headerBackgroundColor": "> backgroundColor | setColorChannel(tableHeaderBackgroundColorConfig)",
+                    "rowColors": "> rowBackgroundColors | maxContrast(tableRowColorMaxContrast)",
+                    "headerColor": "> headerBackgroundColor | maxContrast(tableRowColorMaxContrast)"
+                }
+            },
+            "cornerRadius": [
+                2,
+                0,
+                0,
+                0
+            ]
+        },
+        "viz_qB6ddc7S": {
+            "type": "splunk.markdown",
+            "options": {
+                "markdown": "**Filters**",
+                "fontSize": "extraLarge"
+            }
+        }
+    },
+    "dataSources": {
+        "ds_GhbVFdD9": {
+            "type": "ds.search",
+            "options": {
+                "query": "index=pega LRC\n| rex field=_raw \"LRC Case ID\\s*-\\s*(?<CaseID>[^\\|]+)\"\n| rex field=_raw \"Loan Request Decision - (?<LoanRequestDecision>[^\\|]+)\"\n| timechart count AS TotalCases",
+                "queryParameters": {}
+            },
+            "name": "Search_1"
+        },
+        "ds_nc18AvPe": {
+            "type": "ds.search",
+            "options": {
+                "query": "index=pega LRC \r\n| rex field=_raw \"LRC Case ID\\s*-\\s*(?<CaseID>[^\\|]+)\" \r\n| rex field=_raw \"Full Name - (?<FullName>[^\\|]+)\"\r\n| rex field=_raw \"Age - (?<Age>[^\\|]+)\"\r\n| rex field=_raw \"Gender - (?<Gender>[^\\|]+)\"\r\n| rex field=_raw \"Marital Status - (?<MaritalStatus>[^\\|]+)\"\r\n| rex field=_raw \"Having Kids - (?<HavingKids>[^\\|]+)\"\r\n| rex field=_raw \"Loan Amount - (?<LoanAmount>[^\\|]+)\"\r\n| rex field=_raw \"Loan Tenure - (?<LoanTenure>[^\\|]+)\"\r\n| rex field=_raw \"Loan Request Decision - (?<LoanRequestDecision>[^\\|]+)\"\r\n| rex field=_raw \"Manager comments - (?<ManagerComments>[^\\|]+)\"\r\n| search CaseID=\"$CaseID_filter$\" FullName=\"$FullName_filter$ \" Gender=\"$Gender_filter$ \"\r\n| table CaseID FullName Age Gender MaritalStatus HavingKids LoanAmount LoanTenure LoanRequestDecision ManagerComments\r\n| rename LoanTenure AS \"Loan Tenure (in months)\""
+            },
+            "name": "Search_2"
+        },
+        "ds_GzQrgmrB": {
+            "type": "ds.search",
+            "options": {
+                "query": "index=pega LRC \n| rex field=_raw \"LRC Case ID - (?<CaseID>[^|]+)\"\n| table CaseID\n| dedup CaseID"
+            },
+            "name": "CaseID_filter"
+        },
+        "ds_ohyUXdzw_ds_GzQrgmrB": {
+            "type": "ds.search",
+            "options": {
+                "query": "index=pega LRC \n| rex field=_raw \"LRC Case ID - (?<CaseID>[^|]+)\"\n| table CaseID\n| dedup CaseID"
+            },
+            "name": "CaseID_filter copy 1"
+        }
+    },
+    "defaults": {
+        "dataSources": {
+            "ds.search": {
+                "options": {
+                    "queryParameters": {
+                        "latest": "$global_time.latest$",
+                        "earliest": "$global_time.earliest$"
+                    }
+                }
+            }
+        }
+    },
+    "inputs": {
+        "input_global_trp": {
+            "type": "input.timerange",
+            "options": {
+                "token": "global_time",
+                "defaultValue": "-24h@h,now"
+            },
+            "title": "Global Time Range"
+        },
+        "input_sxlOHWQc": {
+            "options": {
+                "items": ">frame(label, value) | prepend(formattedStatics) | objects()",
+                "token": "CaseID_filter",
+                "backgroundColor": "transparent",
+                "defaultValue": "*"
+            },
+            "title": "Case ID",
+            "type": "input.dropdown",
+            "dataSources": {
+                "primary": "ds_GzQrgmrB"
+            },
+            "context": {
+                "formattedConfig": {
+                    "number": {
+                        "prefix": ""
+                    }
+                },
+                "formattedStatics": ">statics | formatByType(formattedConfig)",
+                "statics": [
+                    [
+                        "ALL"
+                    ],
+                    [
+                        "*"
+                    ]
+                ],
+                "label": ">primary | seriesByName(\"CaseID\") | renameSeries(\"label\") | formatByType(formattedConfig)",
+                "value": ">primary | seriesByName(\"CaseID\") | renameSeries(\"value\") | formatByType(formattedConfig)"
+            }
+        },
+        "input_CSEmlL9W": {
+            "options": {
+                "defaultValue": "*",
+                "token": "FullName_filter"
+            },
+            "title": "Full Name",
+            "type": "input.text"
+        },
+        "input_uy4SmpgM": {
+            "options": {
+                "items": [
+                    {
+                        "label": "ALL",
+                        "value": "*"
+                    },
+                    {
+                        "label": "Male",
+                        "value": "Male"
+                    },
+                    {
+                        "label": "Female",
+                        "value": "Female"
+                    }
+                ],
+                "token": "Gender_filter",
+                "backgroundColor": "transparent",
+                "selectFirstSearchResult": true
+            },
+            "title": "Gender",
+            "type": "input.dropdown",
+            "dataSources": {},
+            "context": {}
+        }
+    },
+    "layout": {
+        "type": "absolute",
+        "options": {
+            "width": 1440,
+            "height": 960,
+            "display": "auto"
+        },
+        "structure": [
+            {
+                "item": "viz_tNcaE4yP",
+                "type": "block",
+                "position": {
+                    "x": 0,
+                    "y": 10,
+                    "w": 1440,
+                    "h": 300
+                }
+            },
+            {
+                "item": "viz_8aHqMHqy",
+                "type": "block",
+                "position": {
+                    "x": 0,
+                    "y": 470,
+                    "w": 1440,
+                    "h": 650
+                }
+            },
+            {
+                "item": "input_sxlOHWQc",
+                "type": "input",
+                "position": {
+                    "x": 10,
+                    "y": 360,
+                    "w": 190,
+                    "h": 82
+                }
+            },
+            {
+                "item": "viz_qB6ddc7S",
+                "type": "block",
+                "position": {
+                    "x": 10,
+                    "y": 320,
+                    "w": 220,
+                    "h": 40
+                }
+            },
+            {
+                "item": "input_CSEmlL9W",
+                "type": "input",
+                "position": {
+                    "x": 240,
+                    "y": 360,
+                    "w": 198,
+                    "h": 82
+                }
+            },
+            {
+                "item": "input_uy4SmpgM",
+                "type": "input",
+                "position": {
+                    "x": 480,
+                    "y": 360,
+                    "w": 190,
+                    "h": 82
+                }
+            }
+        ],
+        "globalInputs": [
+            "input_global_trp"
+        ]
+    },
+    "description": "",
+    "title": "Loan Request Information"
+}

@@ -1,0 +1,23 @@
+Aadhar Card
+
+"LRC Case ID - "+.pyID+" || Full Name - "+.FullName+" || Age - "+.Age+" || Gender - "+.Gender+" || Marital Status - "+.MaritalStatus+" || Having Kids - "+.HavingKids+" || Loan Amount - "+.LoanAmount+" || Loan Tenure - "+.TenureinMonths+" || Loan Request Decision - "+.LoanRequestDecision+" || Manager comments - "+.ManagerComments
+
+
+index=pega LRC 
+| rex field=_raw "LRC Case ID\s*-\s*(?<CaseID>[^\|]+)" 
+| rex field=_raw "Full Name - (?<FullName>[^\|]+)"
+| rex field=_raw "Age - (?<Age>[^\|]+)"
+| rex field=_raw "Gender - (?<Gender>[^\|]+)"
+| rex field=_raw "Marital Status - (?<MaritalStatus>[^\|]+)"
+| rex field=_raw "Having Kids - (?<HavingKids>[^\|]+)"
+| rex field=_raw "Loan Amount - (?<LoanAmount>[^\|]+)"
+| rex field=_raw "Loan Tenure - (?<LoanTenure>[^\|]+)"
+| rex field=_raw "Loan Request Decision - (?<LoanRequestDecision>[^\|]+)"
+| rex field=_raw "Manager comments - (?<ManagerComments>[^\|]+)"
+| search CaseID="$CaseID_filter$" FullName="$FullName_filter$"
+| table CaseID FullName Age Gender MaritalStatus HavingKids LoanAmount LoanTenure LoanRequestDecision ManagerComments
+| rename LoanTenure AS "Loan Tenure (in months)"
+
+
+
+| search CaseID="L-4010 " 
